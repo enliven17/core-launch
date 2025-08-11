@@ -1,0 +1,51 @@
+{
+  "name": "core-launch",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "tailwind:build": "tailwindcss -i ./src/app/globals.css -o ./src/app/output.css",
+    "tailwind:watch": "tailwindcss -i ./src/app/globals.css -o ./src/app/output.css --watch"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.3.0",
+    "@rainbow-me/rainbowkit": "^1.2.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "clsx": "^2.0.0",
+    "ethers": "^6.8.0",
+    "framer-motion": "^10.16.0",
+    "lucide-react": "^0.292.0",
+    "next": "14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-dropzone": "^14.3.8",
+    "react-hook-form": "^7.47.0",
+    "react-icons": "^4.11.0",
+    "tailwind-merge": "^2.0.0",
+    "typescript": "^5.0.0",
+    "viem": "^1.19.0",
+    "wagmi": "^1.4.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^6.1.0",
+    "@openzeppelin/contracts": "^5.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "autoprefixer": "^10.4.21",
+    "dotenv": "^17.2.1",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "14.0.0",
+    "hardhat": "^2.26.2",
+    "postcss": "^8.5.6",
+    "prettier": "^3.0.0",
+    "prettier-plugin-tailwindcss": "^0.5.0",
+    "tailwindcss": "^3.4.17"
+  }
+}
