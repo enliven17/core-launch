@@ -26,6 +26,7 @@ export default function CollectionsPage() {
     const fetchCollections = async () => {
       try {
         setIsLoading(true)
+        setError('')
         console.log('🔍 Fetching collections...')
         
         // Get collections count
@@ -39,6 +40,7 @@ export default function CollectionsPage() {
           console.log('🔗 Collection addresses:', collectionAddresses)
           
           const collectionsData: Collection[] = []
+          let validCollections = 0
           
           // Get info for each collection
           for (const address of collectionAddresses) {
@@ -62,23 +64,33 @@ export default function CollectionsPage() {
                   volume: stats.volume,
                   owners: stats.uniqueOwners.toString()
                 })
+                validCollections++
                 console.log('✅ Collection added:', info.name, 'with', stats.totalSupply, 'NFTs')
               } else {
                 console.log('⚠️ Collection info invalid or not exists:', info)
               }
             } catch (err) {
               console.error(`❌ Error loading collection ${address}:`, err)
+              // Continue with other collections instead of failing completely
             }
           }
           
           console.log('📋 Final collections data:', collectionsData)
+          console.log(`📊 Valid collections loaded: ${validCollections}/${collectionAddresses.length}`)
           setCollections(collectionsData)
+          
+          if (validCollections === 0) {
+            setError('No valid collections found. Please try again later.')
+          }
         } else {
           console.log('📊 No collections found')
+          setCollections([])
+          setError('No collections found on the blockchain yet.')
         }
       } catch (err) {
-        console.error('Error fetching collections:', err)
-        setError('Failed to fetch collections from blockchain')
+        console.error('❌ Error fetching collections:', err)
+        setError('Failed to fetch collections from blockchain. Please try again later.')
+        setCollections([])
       } finally {
         setIsLoading(false)
       }
@@ -197,7 +209,7 @@ export default function CollectionsPage() {
                     <div className="w-full h-48 bg-gradient-to-br from-primary-500/30 to-secondary-500/30 rounded-2xl mb-6 flex items-center justify-center relative overflow-hidden">
                       {/* Collection Icon */}
                       <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center">
-                        <span className="text-3xl font-bold text-white/80">{collection.symbol.charAt(0)}</span>
+                        <span className="text-3xl font-bold text-white/80">{collection.symbol ? collection.symbol.charAt(0) : '?'}</span>
                       </div>
                       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent"></div>
                     </div>

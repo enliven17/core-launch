@@ -121,8 +121,8 @@ export default function ImageUpload({
       ) : (
         <div
           {...getRootProps()}
-          className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer hover:border-primary-400 hover:bg-primary-50 ${
-            isDragActive ? 'border-primary-500 bg-primary-50' : 'border-gray-300'
+          className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors cursor-pointer hover:border-primary-400 hover:bg-primary-500/10 ${
+            isDragActive ? 'border-primary-500 bg-primary-500/20' : 'border-gray-600'
           }`}
         >
           <input {...getInputProps()} />

@@ -3,7 +3,6 @@
 import React from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Zap } from 'lucide-react'
 import WalletConnect from './WalletConnect'
 
 export default function Navbar() {
@@ -21,8 +20,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center">
-              <Zap className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden">
+              <img 
+                src="/corelaunch.png" 
+                alt="Core-Launch Logo" 
+                className="w-full h-full object-cover"
+              />
             </div>
             <h1 className="text-2xl font-bold text-white">Core-Launch</h1>
           </Link>

@@ -5,9 +5,10 @@ import { ethers } from 'ethers'
 import { 
   getCurrentChainId, 
   isCorrectNetwork, 
-  switchToCoreTestnet2,
-  NETWORK_CONFIG 
+  switchToCoreTestnet2
 } from '@/lib/contracts/client'
+import { NETWORK_CONFIG } from '@/lib/contracts/constants'
+import { blockUnwantedWallets } from '@/utils/walletDetection'
 
 interface WalletState {
   isConnected: boolean
@@ -54,7 +55,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
     isInitialized: false,
   })
 
-  // Check if wallet is connected
   const checkConnection = useCallback(async () => {
     if (typeof window === 'undefined' || !window.ethereum) {
       setWalletState(prev => ({
@@ -68,13 +68,35 @@ export function WalletProvider({ children }: WalletProviderProps) {
 
     try {
       const accounts = await window.ethereum.request({ method: 'eth_accounts' })
-      const chainId = await getCurrentChainId()
       
       if (accounts.length > 0) {
         const address = accounts[0]
-        const isCorrect = chainId ? isCorrectNetwork(chainId) : false
         
-        // Get balance
+        let chainId: number | null = null
+        try {
+          const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' })
+          chainId = parseInt(chainIdHex, 16)
+          console.log('🔗 Raw chain ID from MetaMask:', chainIdHex, '→ Parsed:', chainId)
+        } catch (error) {
+          console.error('❌ Error getting chain ID:', error)
+          chainId = null
+        }
+        
+        const expectedChainId = NETWORK_CONFIG.CHAIN_ID
+        const isCorrect = chainId === expectedChainId
+        
+        console.log('🔍 Wallet connection check:', {
+          address,
+          chainId,
+          expectedChainId,
+          isCorrect,
+          networkName: chainId === 1114 ? 'Core Testnet2' : 
+                      chainId === 1 ? 'Ethereum Mainnet' :
+                      chainId === 56 ? 'BSC Mainnet' :
+                      chainId === 137 ? 'Polygon' : 'Unknown',
+          comparison: `${chainId} === ${expectedChainId} = ${isCorrect}`
+        })
+        
         const provider = new ethers.BrowserProvider(window.ethereum)
         const balance = await provider.getBalance(address)
         
@@ -110,7 +132,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
     }
   }, [])
 
-  // Connect wallet
   const connectWallet = useCallback(async () => {
     if (typeof window === 'undefined' || !window.ethereum) {
       setWalletState(prev => ({
@@ -125,10 +146,32 @@ export function WalletProvider({ children }: WalletProviderProps) {
     try {
       const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
       const address = accounts[0]
-      const chainId = await getCurrentChainId()
-      const isCorrect = chainId ? isCorrectNetwork(chainId) : false
+      
+      let chainId: number | null = null
+      try {
+        const chainIdHex = await window.ethereum.request({ method: 'eth_chainId' })
+        chainId = parseInt(chainIdHex, 16)
+        console.log('🔗 Raw chain ID from MetaMask:', chainIdHex, '→ Parsed:', chainId)
+      } catch (error) {
+        console.error('❌ Error getting chain ID:', error)
+        chainId = null
+      }
+      
+      const expectedChainId = NETWORK_CONFIG.CHAIN_ID
+      const isCorrect = chainId === expectedChainId
 
-      // Get balance
+      console.log('🔗 Wallet connected:', {
+        address,
+        chainId,
+        expectedChainId,
+        isCorrect,
+        networkName: chainId === 1114 ? 'Core Testnet2' : 
+                    chainId === 1 ? 'Ethereum Mainnet' :
+                    chainId === 56 ? 'BSC Mainnet' :
+                    chainId === 137 ? 'Polygon' : 'Unknown',
+        comparison: `${chainId} === ${expectedChainId} = ${isCorrect}`
+      })
+
       const provider = new ethers.BrowserProvider(window.ethereum)
       const balance = await provider.getBalance(address)
 
@@ -152,7 +195,6 @@ export function WalletProvider({ children }: WalletProviderProps) {
     }
   }, [])
 
-  // Disconnect wallet
   const disconnectWallet = useCallback(() => {
     setWalletState(prev => ({
       ...prev,
@@ -166,12 +208,10 @@ export function WalletProvider({ children }: WalletProviderProps) {
     }))
   }, [])
 
-  // Switch to correct network
   const switchNetwork = useCallback(async () => {
     try {
       const success = await switchToCoreTestnet2()
       if (success) {
-        // Recheck connection after network switch
         setTimeout(checkConnection, 1000)
       }
     } catch (error) {
@@ -183,9 +223,10 @@ export function WalletProvider({ children }: WalletProviderProps) {
     }
   }, [checkConnection])
 
-  // Listen for wallet events
   useEffect(() => {
     if (typeof window === 'undefined' || !window.ethereum) return
+
+    blockUnwantedWallets()
 
     const handleAccountsChanged = (accounts: string[]) => {
       if (accounts.length === 0) {
@@ -199,23 +240,16 @@ export function WalletProvider({ children }: WalletProviderProps) {
       checkConnection()
     }
 
-    const handleDisconnect = () => {
-      disconnectWallet()
-    }
-
     window.ethereum.on('accountsChanged', handleAccountsChanged)
     window.ethereum.on('chainChanged', handleChainChanged)
-    window.ethereum.on('disconnect', handleDisconnect)
 
-    // Initial check
     checkConnection()
 
     return () => {
       window.ethereum.removeListener('accountsChanged', handleAccountsChanged)
       window.ethereum.removeListener('chainChanged', handleChainChanged)
-      window.ethereum.removeListener('disconnect', handleDisconnect)
     }
-  }, [checkConnection, disconnectWallet])
+  }, [checkConnection])
 
   const value = {
     walletState,
@@ -231,3 +265,4 @@ export function WalletProvider({ children }: WalletProviderProps) {
     </WalletContext.Provider>
   )
 }
+

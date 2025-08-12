@@ -12,6 +12,7 @@ import {
   Send, 
   Github,
   Crown,
+  DollarSign,
   AlertCircle,
   AlertTriangle,
   CheckCircle
@@ -108,13 +109,14 @@ export default function CollectionForm({ onSubmit, isLoading = false }: Collecti
 
       // Submit form
       onSubmit(sanitizedData)
+      setFormErrors([])
     } catch (error) {
       console.error('Form submission error:', error)
       setFormErrors(['An unexpected error occurred. Please try again.'])
     }
   }
 
-  const handleCoverImageUpload = (file: File) => {
+  const handleCoverImageSelect = (file: File) => {
     setCoverImage(file)
   }
 
@@ -122,50 +124,52 @@ export default function CollectionForm({ onSubmit, isLoading = false }: Collecti
     setCoverImage(null)
   }
 
+
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Wallet Connection Check */}
-      {!isConnected ? (
-        <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-3xl p-8 text-center shadow-lg backdrop-blur-sm">
-          <div className="flex items-center justify-center space-x-3 text-yellow-300 mb-6">
-            <div className="w-12 h-12 bg-yellow-500/20 rounded-2xl flex items-center justify-center border border-yellow-500/30">
-              <AlertTriangle className="w-7 h-7 text-yellow-400" />
+        {!isConnected ? (
+          <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-3xl p-8 text-center shadow-lg backdrop-blur-sm">
+            <div className="flex items-center justify-center space-x-3 text-yellow-300 mb-6">
+              <div className="w-12 h-12 bg-yellow-500/20 rounded-2xl flex items-center justify-center border border-yellow-500/30">
+                <AlertTriangle className="w-7 h-7 text-yellow-400" />
+              </div>
+              <span className="text-2xl font-bold">Wallet Not Connected</span>
             </div>
-            <span className="text-2xl font-bold">Wallet Not Connected</span>
-          </div>
-          <p className="text-yellow-200 mb-6 text-lg leading-relaxed">
-            Please connect your wallet to create a collection. Make sure you're connected to Core Blockchain Testnet2. Collection creation fee: 0.1 CORE.
-          </p>
-          <div className="inline-block">
-            <WalletConnect />
-          </div>
-        </div>
-      ) : !isCorrectNetwork ? (
-        <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-3xl p-8 text-center shadow-lg backdrop-blur-sm">
-          <div className="flex items-center justify-center space-x-3 text-orange-300 mb-6">
-            <div className="w-12 h-12 bg-orange-500/20 rounded-2xl flex items-center justify-center border border-orange-500/30">
-              <AlertTriangle className="w-7 h-7 text-orange-400" />
+            <p className="text-yellow-200 mb-6 text-lg leading-relaxed">
+              Please connect your wallet to create a collection. Make sure you're connected to Core Blockchain Testnet2. Collection creation fee: 0.1 CORE.
+            </p>
+            <div className="inline-block">
+              <WalletConnect />
             </div>
-            <span className="text-2xl font-bold">Wrong Network</span>
           </div>
-          <p className="text-orange-200 mb-6 text-lg leading-relaxed">
-            Please switch to Core Blockchain Testnet2 to create a collection.
-          </p>
-          <button
-            onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3 rounded-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-          >
-            Switch Network
-          </button>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-8">
+        ) : !isCorrectNetwork ? (
+          <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-3xl p-8 text-center shadow-lg backdrop-blur-sm">
+            <div className="flex items-center justify-center space-x-3 text-orange-300 mb-6">
+              <div className="w-12 h-12 bg-orange-500/20 rounded-2xl flex items-center justify-center border border-orange-500/30">
+                <AlertTriangle className="w-7 h-7 text-orange-400" />
+              </div>
+              <span className="text-2xl font-bold">Wrong Network</span>
+            </div>
+            <p className="text-orange-200 mb-6 text-lg leading-relaxed">
+              Please switch to Core Blockchain Testnet2 to create a collection.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3 rounded-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+            >
+              Switch Network
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-8">
           
           {/* Creation Fee Notice */}
           <div className="bg-gradient-to-r from-primary-500/10 to-secondary-500/10 border border-primary-500/30 rounded-2xl p-6 backdrop-blur-sm">
             <div className="flex items-center space-x-3 mb-3">
               <div className="w-8 h-8 bg-primary-500/20 rounded-xl flex items-center justify-center border border-primary-500/30">
-                <span className="text-lg font-bold text-primary-400">₵</span>
+                <DollarSign className="w-5 h-5 text-primary-400" />
               </div>
               <h3 className="text-lg font-semibold text-white">Collection Creation Fee</h3>
             </div>
@@ -247,7 +251,7 @@ export default function CollectionForm({ onSubmit, isLoading = false }: Collecti
           {/* Collection Settings */}
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-              <span className="w-5 h-5 bg-secondary-400 rounded-full flex items-center justify-center text-xs font-bold text-white">₵</span>
+              <DollarSign className="w-5 h-5 text-secondary-400" />
               <span>Collection Settings</span>
             </h3>
             
@@ -281,42 +285,50 @@ export default function CollectionForm({ onSubmit, isLoading = false }: Collecti
                     placeholder="5"
                     min="0"
                     max="25"
+                    step="0.1"
                   />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">%</span>
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                    %
+                  </span>
                 </div>
                 {errors.royaltyPercentage && (
                   <p className="mt-1 text-sm text-red-600">{errors.royaltyPercentage.message}</p>
                 )}
+                <p className="mt-1 text-xs text-gray-400">
+                  Percentage of sales that goes to collection creator
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Cover Image */}
+          {/* Images */}
           <div className="space-y-6">
-            <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-              <Sparkles className="w-5 h-5 text-primary-400" />
-              <span>Cover Image</span>
-            </h3>
+            <h3 className="text-lg font-semibold text-white">Images</h3>
             
-            <ImageUpload
-              onImageUpload={handleCoverImageUpload}
-              onImageRemove={handleCoverImageRemove}
-              currentImage={coverImage}
-              accept="image/*"
-              maxSize={5 * 1024 * 1024} // 5MB
-            />
+            <div className="space-y-6">
+              <ImageUpload
+                label="Cover Image *"
+                required
+                selectedImage={coverImage}
+                onImageSelect={handleCoverImageSelect}
+                onImageRemove={handleCoverImageRemove}
+                className="max-w-md"
+              />
+
+
+            </div>
           </div>
 
           {/* Social Links */}
           <div className="space-y-6">
             <h3 className="text-lg font-semibold text-white flex items-center space-x-2">
-              <Globe className="w-5 h-5 text-secondary-400" />
+              <Globe className="w-5 h-5 text-primary-400" />
               <span>Social Links</span>
             </h3>
             
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center space-x-2">
+                <label className="block text-sm font-medium text-white mb-2 flex items-center space-x-2">
                   <Globe className="w-4 h-4 text-gray-300" />
                   <span>Website</span>
                 </label>
@@ -332,7 +344,7 @@ export default function CollectionForm({ onSubmit, isLoading = false }: Collecti
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center space-x-2">
+                <label className="block text-sm font-medium text-white mb-2 flex items-center space-x-2">
                   <Twitter className="w-4 h-4 text-gray-300" />
                   <span>Twitter</span>
                 </label>
@@ -348,7 +360,7 @@ export default function CollectionForm({ onSubmit, isLoading = false }: Collecti
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center space-x-2">
+                <label className="block text-sm font-medium text-white mb-2 flex items-center space-x-2">
                   <MessageCircle className="w-4 h-4 text-gray-300" />
                   <span>Discord</span>
                 </label>
@@ -364,7 +376,7 @@ export default function CollectionForm({ onSubmit, isLoading = false }: Collecti
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center space-x-2">
+                <label className="block text-sm font-medium text-white mb-2 flex items-center space-x-2">
                   <Send className="w-4 h-4 text-gray-300" />
                   <span>Telegram</span>
                 </label>
@@ -380,7 +392,7 @@ export default function CollectionForm({ onSubmit, isLoading = false }: Collecti
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2 flex items-center space-x-2">
+                <label className="block text-sm font-medium text-white mb-2 flex items-center space-x-2">
                   <Github className="w-4 h-4 text-gray-300" />
                   <span>GitHub</span>
                 </label>
@@ -431,22 +443,22 @@ export default function CollectionForm({ onSubmit, isLoading = false }: Collecti
                 disabled={isLoading}
                 className="bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-semibold text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                {isLoading ? (
-                  <div className="flex items-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Creating Collection...</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2">
-                    <Sparkles className="w-5 h-5" />
-                    <span>Create Collection</span>
-                  </div>
-                )}
-              </button>
-            </div>
-          </div>
-        </form>
-      )}
-    </div>
-  )
-}
+              {isLoading ? (
+                <div className="flex items-center space-x-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Creating Collection...</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Sparkles className="w-5 h-5" />
+                  <span>Create Collection</span>
+                </div>
+              )}
+            </button>
+                      </div>
+          </form>
+        )}
+        </div>
+      </div>
+    )
+  }

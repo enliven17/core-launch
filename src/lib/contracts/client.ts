@@ -1,14 +1,12 @@
 import { ethers } from 'ethers'
 import { CONTRACT_ADDRESSES, CONTRACT_ABIS, NETWORK_CONFIG } from './constants'
 
-// Extend Window interface for ethereum
 declare global {
   interface Window {
     ethereum?: any
   }
 }
 
-// Provider and Signer setup
 export function getProvider() {
   if (typeof window !== 'undefined' && window.ethereum) {
     return new ethers.BrowserProvider(window.ethereum)
@@ -24,7 +22,6 @@ export async function getSigner() {
   throw new Error('Browser provider not available')
 }
 
-// Contract instances
 export function getNFTCollectionFactoryContract(signer?: ethers.Signer) {
   const provider = signer ? signer.provider : getProvider()
   const contractSigner = signer || provider
@@ -36,7 +33,6 @@ export function getNFTCollectionFactoryContract(signer?: ethers.Signer) {
   )
 }
 
-// Contract functions
 export async function createCollection(
   name: string,
   symbol: string,
@@ -48,8 +44,7 @@ export async function createCollection(
   try {
     const contract = getNFTCollectionFactoryContract(signer)
     
-    // Calculate creation fee in wei
-    const creationFee = ethers.parseEther('0.1') // 0.1 CORE
+    const creationFee = ethers.parseEther('1')
     
     const tx = await contract.createCollection(
       name,
@@ -62,7 +57,6 @@ export async function createCollection(
     
     const receipt = await tx.wait()
     
-    // Find CollectionCreated event
     const event = receipt.logs.find((log: any) => {
       try {
         const parsed = contract.interface.parseLog(log)
@@ -96,30 +90,22 @@ export async function createCollection(
   }
 }
 
-export async function getCollectionsCount() {
-  try {
-    const contract = getNFTCollectionFactoryContract()
-    const count = await contract.getCollectionsCount()
-    return parseInt(count.toString())
-  } catch (error) {
-    console.error('Error getting collections count:', error)
-    return 0
-  }
-}
-
 export async function getAllCollections() {
   try {
+    console.log('🔍 Getting all collections from factory...')
     const contract = getNFTCollectionFactoryContract()
     const collections = await contract.getAllCollections()
+    console.log('✅ Collections loaded:', collections.length)
     return collections
   } catch (error) {
-    console.error('Error getting all collections:', error)
+    console.error('❌ Error getting all collections:', error)
     return []
   }
 }
 
 export async function getCollectionInfo(collectionAddress: string) {
   try {
+    console.log('🔍 Getting collection info for:', collectionAddress)
     const contract = getNFTCollectionFactoryContract()
     const info = await contract.collections(collectionAddress)
     
@@ -134,7 +120,6 @@ export async function getCollectionInfo(collectionAddress: string) {
       exists: info.exists
     })
     
-    // Check if required properties exist
     if (!info.creator || !info.name || !info.symbol) {
       console.error('❌ Missing required collection properties')
       return null
@@ -147,65 +132,25 @@ export async function getCollectionInfo(collectionAddress: string) {
       creationTime: info.creationTime ? parseInt(info.creationTime.toString()) : 0,
       maxSupply: info.maxSupply ? parseInt(info.maxSupply.toString()) : 0,
       royalty: info.royalty ? parseInt(info.royalty.toString()) : 0,
-      exists: info.exists || true // Default to true if not specified
+      exists: info.exists || true
     }
   } catch (error) {
-    console.error('Error getting collection info:', error)
+    console.error('❌ Error getting collection info for', collectionAddress, ':', error)
     return null
   }
 }
 
-// Network utilities
-export async function switchToCoreTestnet2() {
-  if (typeof window !== 'undefined' && window.ethereum) {
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: `0x${NETWORK_CONFIG.CHAIN_ID.toString(16)}` }],
-      })
-      return true
-    } catch (error: any) {
-      if (error.code === 4902) {
-        // Chain not added, add it
-        try {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: `0x${NETWORK_CONFIG.CHAIN_ID.toString(16)}`,
-              chainName: 'Core Blockchain Testnet2',
-              nativeCurrency: NETWORK_CONFIG.NATIVE_CURRENCY,
-              rpcUrls: [NETWORK_CONFIG.RPC_URL],
-              blockExplorerUrls: [NETWORK_CONFIG.EXPLORER_URL],
-            }],
-          })
-          return true
-        } catch (addError) {
-          console.error('Error adding chain:', addError)
-          return false
-        }
-      }
-      console.error('Error switching chain:', error)
-      return false
-    }
+export async function getCollectionsCount() {
+  try {
+    console.log('🔍 Getting collections count...')
+    const contract = getNFTCollectionFactoryContract()
+    const count = await contract.getCollectionsCount()
+    console.log('✅ Collections count:', count.toString())
+    return parseInt(count.toString())
+  } catch (error) {
+    console.error('❌ Error getting collections count:', error)
+    return 0
   }
-  return false
-}
-
-export async function getCurrentChainId(): Promise<number | null> {
-  if (typeof window !== 'undefined' && window.ethereum) {
-    try {
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' })
-      return parseInt(chainId, 16)
-    } catch (error) {
-      console.error('Error getting chain ID:', error)
-      return null
-    }
-  }
-  return null
-}
-
-export function isCorrectNetwork(chainId: number): boolean {
-  return chainId === NETWORK_CONFIG.CHAIN_ID
 }
 
 export async function getCollectionNFTCount(collectionAddress: string) {
@@ -242,14 +187,12 @@ export async function getCollectionStats(collectionAddress: string) {
     const totalSupply = await collectionContract.totalSupply()
     const totalSupplyNum = parseInt(totalSupply.toString())
     
-    // Get unique owners (simplified - just count different addresses that own tokens)
     const owners = new Set()
     for (let i = 1; i <= totalSupplyNum; i++) {
       try {
         const owner = await collectionContract.ownerOf(i)
         owners.add(owner.toLowerCase())
       } catch (err) {
-        // Token might not exist
         break
       }
     }
@@ -257,7 +200,7 @@ export async function getCollectionStats(collectionAddress: string) {
     return {
       totalSupply: totalSupplyNum,
       uniqueOwners: owners.size,
-      volume: '0.0' // Will be updated when trading starts
+      volume: '0.0'
     }
   } catch (error) {
     console.error('Error getting collection stats:', error)
@@ -269,78 +212,36 @@ export async function getCollectionStats(collectionAddress: string) {
   }
 }
 
-export async function getCollectionNFTs(collectionAddress: string) {
+export async function mintNFT(
+  collectionAddress: string,
+  to: string,
+  tokenURI: string,
+  mintPrice: bigint
+) {
   try {
+    const signer = await getSigner()
+    
     const collectionContract = new ethers.Contract(
       collectionAddress,
       [
+        "function name() view returns (string)",
+        "function symbol() view returns (string)",
         "function totalSupply() view returns (uint256)",
         "function ownerOf(uint256 tokenId) view returns (address)",
-        "function tokenURI(uint256 tokenId) view returns (string)"
+        "function tokenURI(uint256 tokenId) view returns (string)",
+        "function balanceOf(address owner) view returns (uint256)",
+        "function publicMint(address to, string memory tokenURI) external payable returns (uint256)"
       ],
-      getProvider()
+      signer
     )
     
-    const totalSupply = await collectionContract.totalSupply()
-    const totalSupplyNum = parseInt(totalSupply.toString())
+    console.log('🪙 Minting NFT with price:', ethers.formatEther(mintPrice), 'CORE')
     
-    const nfts = []
-    
-    for (let i = 1; i <= totalSupplyNum; i++) {
-      try {
-        const owner = await collectionContract.ownerOf(i)
-        const tokenURI = await collectionContract.tokenURI(i)
-        
-        nfts.push({
-          tokenId: i,
-          tokenURI,
-          owner,
-          price: '0.0', // Will be updated when marketplace is implemented
-          forSale: false // Will be updated when marketplace is implemented
-        })
-      } catch (err) {
-        // Token might not exist
-        console.log(`Token ${i} not found or error:`, err)
-        break
-      }
-    }
-    
-    return nfts
-  } catch (error) {
-    console.error('Error getting collection NFTs:', error)
-    return []
-  }
-}
-
-// Bidding functions
-export function getNFTBiddingContract(signer?: ethers.Signer) {
-  const contract = new ethers.Contract(
-    CONTRACT_ADDRESSES.NFT_BIDDING,
-    CONTRACT_ABIS.NFT_BIDDING,
-    signer || getProvider()
-  )
-  return contract
-}
-
-export async function startBidding(
-  nftContract: string,
-  tokenId: number,
-  minBid: string,
-  duration: number,
-  message: string,
-  signer: ethers.Signer
-) {
-  try {
-    const contract = getNFTBiddingContract(signer)
-    const minBidWei = ethers.parseEther(minBid)
-    
-    console.log('🚀 Starting bidding for NFT:', { nftContract, tokenId, minBid, duration, message })
-    
-    const tx = await contract.startBidding(nftContract, tokenId, minBidWei, duration, message)
-    console.log('⏳ Transaction sent:', tx.hash)
+    const tx = await collectionContract.publicMint(to, tokenURI, { value: mintPrice })
+    console.log('⏳ Mint transaction sent:', tx.hash)
     
     const receipt = await tx.wait()
-    console.log('✅ Bidding started successfully!')
+    console.log('✅ NFT minted successfully!')
     
     return {
       success: true,
@@ -348,7 +249,7 @@ export async function startBidding(
       receipt
     }
   } catch (error) {
-    console.error('Error starting bidding:', error)
+    console.error('Error minting NFT:', error)
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
@@ -365,12 +266,21 @@ export async function placeBid(
 ) {
   try {
     const contract = getNFTBiddingContract(signer)
+    
+    const amountNum = parseFloat(amount)
+    if (isNaN(amountNum) || amountNum <= 0) {
+      return {
+        success: false,
+        error: 'Invalid bid amount. Must be greater than 0.'
+      }
+    }
+    
     const amountWei = ethers.parseEther(amount)
     
-    console.log('💰 Placing bid for NFT:', { nftContract, tokenId, amount, message })
+    console.log('💰 Placing bid:', { nftContract, tokenId, amount, message })
     
     const tx = await contract.placeBid(nftContract, tokenId, message, { value: amountWei })
-    console.log('⏳ Transaction sent:', tx.hash)
+    console.log('⏳ Bid transaction sent:', tx.hash)
     
     const receipt = await tx.wait()
     console.log('✅ Bid placed successfully!')
@@ -382,6 +292,66 @@ export async function placeBid(
     }
   } catch (error) {
     console.error('Error placing bid:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
+  }
+}
+
+export async function acceptBid(
+  nftContract: string,
+  tokenId: number,
+  signer: ethers.Signer
+) {
+  try {
+    const contract = getNFTBiddingContract(signer)
+    
+    console.log('✅ Accepting bid for NFT:', { nftContract, tokenId })
+    
+    const tx = await contract.acceptBid(nftContract, tokenId)
+    console.log('⏳ Accept bid transaction sent:', tx.hash)
+    
+    const receipt = await tx.wait()
+    console.log('✅ Bid accepted successfully!')
+    
+    return {
+      success: true,
+      transactionHash: tx.hash,
+      receipt
+    }
+  } catch (error) {
+    console.error('Error accepting bid:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
+  }
+}
+
+export async function withdrawBid(
+  nftContract: string,
+  tokenId: number,
+  signer: ethers.Signer
+) {
+  try {
+    const contract = getNFTBiddingContract(signer)
+    
+    console.log('↶ Withdrawing bid for NFT:', { nftContract, tokenId })
+    
+    const tx = await contract.withdrawBid(nftContract, tokenId)
+    console.log('⏳ Withdraw bid transaction sent:', tx.hash)
+    
+    const receipt = await tx.wait()
+    console.log('✅ Bid withdrawn successfully!')
+    
+    return {
+      success: true,
+      transactionHash: tx.hash,
+      receipt
+    }
+  } catch (error) {
+    console.error('Error withdrawing bid:', error)
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
@@ -432,54 +402,64 @@ export async function getBids(nftContract: string, tokenId: number) {
   }
 }
 
-export async function acceptBid(nftContract: string, tokenId: number, signer: ethers.Signer) {
-  try {
-    const contract = getNFTBiddingContract(signer)
-    
-    console.log('✅ Accepting bid for NFT:', { nftContract, tokenId })
-    
-    const tx = await contract.acceptBid(nftContract, tokenId)
-    console.log('⏳ Transaction sent:', tx.hash)
-    
-    const receipt = await tx.wait()
-    console.log('✅ Bid accepted successfully!')
-    
-    return {
-      success: true,
-      transactionHash: tx.hash,
-      receipt
-    }
-  } catch (error) {
-    console.error('Error accepting bid:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+export async function switchToCoreTestnet2() {
+  if (typeof window !== 'undefined' && window.ethereum) {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: `0x${NETWORK_CONFIG.CHAIN_ID.toString(16)}` }],
+      })
+      return true
+    } catch (error: any) {
+      if (error.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: `0x${NETWORK_CONFIG.CHAIN_ID.toString(16)}`,
+              chainName: 'Core Blockchain Testnet2',
+              nativeCurrency: NETWORK_CONFIG.NATIVE_CURRENCY,
+              rpcUrls: [NETWORK_CONFIG.RPC_URL],
+              blockExplorerUrls: [NETWORK_CONFIG.EXPLORER_URL],
+            }],
+          })
+          return true
+        } catch (addError) {
+          console.error('Error adding chain:', addError)
+          return false
+        }
+      }
+      console.error('Error switching chain:', error)
+      return false
     }
   }
+  return false
 }
 
-export async function withdrawBid(nftContract: string, tokenId: number, signer: ethers.Signer) {
-  try {
-    const contract = getNFTBiddingContract(signer)
-    
-    console.log('💸 Withdrawing bid for NFT:', { nftContract, tokenId })
-    
-    const tx = await contract.withdrawBid(nftContract, tokenId)
-    console.log('⏳ Transaction sent:', tx.hash)
-    
-    const receipt = await tx.wait()
-    console.log('✅ Bid withdrawn successfully!')
-    
-    return {
-      success: true,
-      transactionHash: tx.hash,
-      receipt
-    }
-  } catch (error) {
-    console.error('Error withdrawing bid:', error)
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
+export async function getCurrentChainId(): Promise<number | null> {
+  if (typeof window !== 'undefined' && window.ethereum) {
+    try {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' })
+      return parseInt(chainId, 16)
+    } catch (error) {
+      console.error('Error getting chain ID:', error)
+      return null
     }
   }
+  return null
+}
+
+export function isCorrectNetwork(chainId: number): boolean {
+  return chainId === NETWORK_CONFIG.CHAIN_ID
+}
+
+function getNFTBiddingContract(signer?: ethers.Signer) {
+  const provider = signer ? signer.provider : getProvider()
+  const contractSigner = signer || provider
+  
+  return new ethers.Contract(
+    CONTRACT_ADDRESSES.NFT_BIDDING,
+    CONTRACT_ABIS.NFT_BIDDING,
+    contractSigner
+  )
 }

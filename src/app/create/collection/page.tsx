@@ -8,6 +8,7 @@ import CollectionForm from '@/components/nft/CollectionForm'
 import { CreateCollectionForm } from '@/types'
 import { getSigner, createCollection } from '@/lib/contracts/client'
 import Navbar from '@/components/ui/Navbar'
+import WalletConnect from '@/components/ui/WalletConnect'
 
 export default function CreateCollectionPage() {
   const router = useRouter()
@@ -140,9 +141,20 @@ export default function CreateCollectionPage() {
             </div>
             <h1 className="text-5xl font-bold text-white">Create Collection</h1>
           </div>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-4">
             Launch your NFT collection on Core Blockchain Testnet2. Create a unique collection with custom metadata, images, and social links.
           </p>
+          
+          {/* Creation Fee Info */}
+          <div className="inline-flex items-center space-x-3 bg-gradient-to-r from-primary-500/20 to-secondary-500/20 border border-primary-500/30 rounded-2xl px-6 py-3 backdrop-blur-sm">
+            <div className="w-8 h-8 bg-primary-500/20 rounded-xl flex items-center justify-center border border-primary-500/30">
+              <span className="text-lg font-bold text-primary-400">₵</span>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-bold text-white">Collection Creation Fee: 0.1 CORE</div>
+              <div className="text-sm text-primary-300">One-time payment to deploy your collection</div>
+            </div>
+          </div>
         </div>
 
         {/* Error Display */}

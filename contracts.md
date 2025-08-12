@@ -14,14 +14,48 @@ This documentation contains all deployed smart contracts and their details for t
 
 ### 1. NFT Collection Factory
 **Contract**: `NFTCollectionFactory.sol`
-- **Address**: `0xAaFE053F1D8402282c839aeb595218F30aa7DCC6`
+- **Address**: `0xAaFE053F1D8402282c839aeb595218F30aa7DCC6` *(OLD - DEPRECATED)*
 - **Purpose**: Factory contract for creating NFT collections
 - **Features**:
   - Collection creation
   - Collection count tracking
   - Collection listing
 - **Deployment Date**: 2025-01-11
+- **Status**: ❌ Deprecated - Replaced by new version
 - **Explorer**: [View Contract](https://scan.test2.btcs.network/address/0xAaFE053F1D8402282c839aeb595218F30aa7DCC6)
+
+### 1.1. NFT Collection Factory (NEW)
+**Contract**: `NFTCollectionFactory.sol` *(Updated Version)*
+- **Address**: `0x0E90a99b22Cc5b281FF52f418BAe4ec909a7F5fb`
+- **Purpose**: Factory contract for creating NFT collections with public minting support
+- **Features**:
+  - Collection creation (1 CORE fee)
+  - Collection count tracking
+  - Collection listing
+  - **NEW**: Automatic public minting setup (0.5 CORE mint price)
+  - **NEW**: Enhanced minting controls
+- **Deployment Date**: 2025-01-12
+- **Status**: ✅ Active - Current version
+- **Collection Creation Fee**: 1 CORE
+- **Default Mint Price**: 0.5 CORE
+- **Explorer**: [View Contract](https://scan.test2.btcs.network/address/0x0E90a99b22Cc5b281FF52f418BAe4ec909a7F5fb)
+
+### 1.2. NFT Collection Factory (LATEST)
+**Contract**: `NFTCollectionFactory.sol` *(Latest Version - 0.1 CORE Fee)*
+- **Address**: `0x2823Af7e1F2F50703eD9f81Ac4B23DC1E78B9E53`
+- **Purpose**: Factory contract for creating NFT collections with reduced fees
+- **Features**:
+  - Collection creation (0.1 CORE fee) - **REDUCED FEE**
+  - Collection count tracking
+  - Collection listing
+  - **NEW**: Automatic public minting setup (0.5 CORE mint price)
+  - **NEW**: Enhanced minting controls
+  - **NEW**: Fixed setMintPrice issue
+- **Deployment Date**: 2025-01-12
+- **Status**: ✅ Active - Latest version
+- **Collection Creation Fee**: 0.1 CORE *(Reduced from 1 CORE)*
+- **Default Mint Price**: 0.5 CORE
+- **Explorer**: [View Contract](https://scan.test2.btcs.network/address/0x2823Af7e1F2F50703eD9f81Ac4B23DC1E78B9E53)
 
 ### 2. NFT Marketplace
 **Contract**: `NFTMarketplace.sol`
@@ -81,6 +115,19 @@ This documentation contains all deployed smart contracts and their details for t
 - **Name**: Gaming Legends
 - **Symbol**: GL
 - **Max Supply**: Unlimited (∞)
+
+### 4. Core Launch Public Collection (CLPC) - NEW
+**Contract**: `NFTCollection.sol` *(Latest Factory)*
+- **Address**: `0xdE4AfE2a9646299b97e35C0B3C50D04cCb74Bf3a`
+- **Name**: Core Launch Public Collection
+- **Symbol**: CLPC
+- **Max Supply**: 1,000 NFTs
+- **Royalty**: 5%
+- **Creator**: `0x71197e7a1CA5A2cb2AD82432B924F69B1E3dB123`
+- **Minted NFTs**: 1
+- **Mint Price**: 0.5 CORE
+- **Factory**: Latest Factory (0.1 CORE fee)
+- **Explorer**: [View Contract](https://scan.test2.btcs.network/address/0xdE4AfE2a9646299b97e35C0B3C50D04cCb74Bf3a)
 - **Royalty**: 15%
 - **Creator**: `0x71197e7a1CA5A2cb2AD82432B924F69B1E3dB123`
 - **Minted NFTs**: 5
@@ -92,12 +139,17 @@ This documentation contains all deployed smart contracts and their details for t
 - **Role**: Contract deployer, NFT creator, initial owner
 
 ## 📊 Contract Statistics
-- **Total Collections**: 3
-- **Total NFTs Minted**: 12
-- **Total Contracts**: 5 (3 NFT Collections + 1 Factory + 1 Marketplace + 1 Bidding)
+- **Total Collections**: 4
+- **Total NFTs Minted**: 14
+- **Total Contracts**: 7 (4 NFT Collections + 3 Factories + 1 Marketplace + 1 Bidding)
+- **Active Factory**: `0x2823Af7e1F2F50703eD9f81Ac4B23DC1E78B9E53` *(Latest - 0.1 CORE fee)*
+- **Previous Factory**: `0x0E90a99b22Cc5b281FF52f418BAe4ec909a7F5fb` *(1 CORE fee)*
+- **Deprecated Factory**: `0xAaFE053F1D8402282c839aeb595218F30aa7DCC6` *(Old version)*
 - **Total Platform Fees**: 
   - Marketplace: 2.5%
   - Bidding: 1%
+- **Collection Creation Fee**: 0.1 CORE *(Latest)*, 1 CORE *(Previous)*
+- **Default NFT Mint Price**: 0.5 CORE
 
 ## 🛠️ Development Information
 
@@ -130,7 +182,13 @@ This documentation contains all deployed smart contracts and their details for t
 
 ### Verification Commands
 ```bash
-# Factory verification
+# LATEST Factory verification (Active - 0.1 CORE fee)
+npx hardhat verify --network core-testnet2 0x2823Af7e1F2F50703eD9f81Ac4B23DC1E78B9E53
+
+# PREVIOUS Factory verification (1 CORE fee)
+npx hardhat verify --network core-testnet2 0x0E90a99b22Cc5b281FF52f418BAe4ec909a7F5fb
+
+# OLD Factory verification (Deprecated)
 npx hardhat verify --network core-testnet2 0xAaFE053F1D8402282c839aeb595218F30aa7DCC6
 
 # Marketplace verification
@@ -180,7 +238,7 @@ scripts/
 - **Developer**: Core-Launch Team
 - **Repository**: Core-Launch Project
 - **Network**: Core Blockchain Testnet2
-- **Last Updated**: 2025-01-11
+- **Last Updated**: 2025-01-12 *(Updated with latest factory and new collection)*
 
 ---
 

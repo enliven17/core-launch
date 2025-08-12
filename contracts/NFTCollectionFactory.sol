@@ -14,7 +14,7 @@ contract NFTCollectionFactory is Ownable, ReentrancyGuard {
     using Strings for uint256;
 
     // Collection creation fee in CORE tokens
-    uint256 public constant COLLECTION_CREATION_FEE = 0.1 ether; // 0.1 CORE
+    uint256 public constant COLLECTION_CREATION_FEE = 0.1 ether; // 0.1 CORE (temporary for testing)
 
     // Mapping from collection address to collection info
     mapping(address => CollectionInfo) public collections;

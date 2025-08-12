@@ -15,7 +15,8 @@ A decentralized NFT launchpad platform on Core Blockchain where you can create N
 ## 🚀 Deployed Contracts
 
 ### Core Contracts
-- **NFTCollectionFactory**: `0xAaFE053F1D8402282c839aeb595218F30aa7DCC6`
+- **NFTCollectionFactory (Latest)**: `0x2823Af7e1F2F50703eD9f81Ac4B23DC1E78B9E53` *(0.1 CORE fee)*
+- **NFTCollectionFactory (Previous)**: `0x0E90a99b22Cc5b281FF52f418BAe4ec909a7F5fb` *(1 CORE fee)*
 - **NFTMarketplace**: `0x19E88E3790A43721faD03CD5A68A100E18F40c4E`
 - **NFTBidding**: `0x7a9D78D1E5fe688F80D4C2c06Ca4C0407A967644`
 
@@ -23,6 +24,7 @@ A decentralized NFT launchpad platform on Core Blockchain where you can create N
 - **CLTC Collection**: `0x5b8564DC0BB802C86787C60479eC8D7EB038Fb93`
 - **DAM Collection**: `0x38DC4a41C05AdB41C923c6d912947817E0932957`
 - **GL Collection**: `0x06aB3506fe4B2b0EA048d06A4aEE848F83340290`
+- **CLPC Collection (New)**: `0xdE4AfE2a9646299b97e35C0B3C50D04cCb74Bf3a` *(Latest Factory)*
 
 📋 **For detailed contract information**: [contracts.md](./contracts.md)
 

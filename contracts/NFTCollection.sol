@@ -50,8 +50,8 @@ contract NFTCollection is ERC721, Ownable, ReentrancyGuard {
         _royaltyPercentage = royaltyPercentage;
         _creator = creator;
         mintingEnabled = true;
-        publicMintingEnabled = false;
-        mintPrice = 0; // Free minting by default
+        publicMintingEnabled = true; // Enable public minting by default
+        mintPrice = 0.5 ether; // Set mint price to 0.5 CORE
     }
 
     /**
@@ -201,6 +201,16 @@ contract NFTCollection is ERC721, Ownable, ReentrancyGuard {
     function toggleMinting(bool enabled) external onlyOwner {
         mintingEnabled = enabled;
         emit MintingToggled(enabled);
+    }
+
+    /**
+     * @dev Set mint price (owner only)
+     * @param newPrice New mint price in wei
+     */
+    function setMintPrice(uint256 newPrice) external onlyOwner {
+        uint256 oldPrice = mintPrice;
+        mintPrice = newPrice;
+        emit MintPriceUpdated(oldPrice, newPrice);
     }
 
     /**

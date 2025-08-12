@@ -9,14 +9,14 @@ async function main() {
   console.log("💰 Account balance:", (await ethers.provider.getBalance(deployer.address)).toString());
 
   // Get the factory contract
-  const factoryAddress = "0xAaFE053F1D8402282c839aeb595218F30aa7DCC6";
+  const factoryAddress = "0x2823Af7e1F2F50703eD9f81Ac4B23DC1E78B9E53";
   const factory = await ethers.getContractAt("NFTCollectionFactory", factoryAddress);
   
   console.log("🏭 Factory contract:", factoryAddress);
 
   // Collection parameters
-  const name = "Core Launch Test Collection";
-  const symbol = "CLTC";
+  const name = "Core Launch Public Collection";
+  const symbol = "CLPC";
   const baseURI = "https://api.example.com/metadata/"; // Placeholder URI
   const maxSupply = 1000; // Maximum 1000 NFTs
   const royaltyPercentage = 5; // 5% royalty
@@ -29,7 +29,7 @@ async function main() {
 
   try {
     // Create collection
-    const creationFee = ethers.parseEther('0.1'); // 0.1 CORE
+    const creationFee = ethers.parseEther('0.1'); // 0.1 CORE (temporary for testing)
     
     console.log("💸 Creation fee:", ethers.formatEther(creationFee), "CORE");
     

@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import Navbar from '@/components/ui/Navbar'
 import { getCollectionInfo, getCollectionStats, getCollectionNFTs } from '@/lib/contracts/client'
 import { useWallet } from '@/contexts/WalletContext'
+import BiddingModal from '@/components/nft/BiddingModal'
 
 interface NFT {
   tokenId: number
@@ -29,13 +30,13 @@ interface CollectionDetails {
 
 export default function CollectionDetailsPage() {
   const params = useParams()
-  const { walletState: { isConnected, address } } = useWallet()
+  const { walletState: { isConnected, address, isCorrectNetwork }, switchNetwork } = useWallet()
   const [collection, setCollection] = useState<CollectionDetails | null>(null)
   const [nfts, setNfts] = useState<NFT[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string>('')
-  const [selectedNFT, setSelectedNFT] = useState<NFT | null>(null)
-  const [purchasePrice, setPurchasePrice] = useState('')
+  const [showBiddingModal, setShowBiddingModal] = useState(false)
+  const [biddingNFT, setBiddingNFT] = useState<NFT | null>(null)
 
   const collectionAddress = params.address as string
 
@@ -95,6 +96,11 @@ export default function CollectionDetailsPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const handleOpenBidding = (nft: NFT) => {
+    setBiddingNFT(nft)
+    setShowBiddingModal(true)
   }
 
   const handlePurchaseNFT = async (nft: NFT) => {
@@ -187,19 +193,27 @@ export default function CollectionDetailsPage() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                     <div>
                       <p className="text-gray-400 text-sm">Total Supply</p>
-                      <p className="text-2xl font-bold text-white">{collection.totalSupply}</p>
+                      <p className="text-2xl font-bold text-white">
+                        {isConnected && isCorrectNetwork ? collection.totalSupply : '--'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-sm">Max Supply</p>
-                      <p className="text-2xl font-bold text-white">{collection.maxSupply === 0 ? '∞' : collection.maxSupply}</p>
+                      <p className="text-2xl font-bold text-white">
+                        {isConnected && isCorrectNetwork ? (collection.maxSupply === 0 ? '∞' : collection.maxSupply) : '--'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-sm">Unique Owners</p>
-                      <p className="text-2xl font-bold text-white">{collection.uniqueOwners}</p>
+                      <p className="text-2xl font-bold text-white">
+                        {isConnected && isCorrectNetwork ? collection.uniqueOwners : '--'}
+                      </p>
                     </div>
                     <div>
                       <p className="text-gray-400 text-sm">Royalty</p>
-                      <p className="text-2xl font-bold text-primary-500">{collection.royalty}%</p>
+                      <p className="text-2xl font-bold text-primary-500">
+                        {isConnected && isCorrectNetwork ? `${collection.royalty}%` : '--'}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -237,11 +251,53 @@ export default function CollectionDetailsPage() {
             </div>
           </div>
 
+          {/* Wallet Connection Check */}
+          {!isConnected ? (
+            <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl p-8 text-center mb-8">
+              <h2 className="text-2xl font-bold text-yellow-300 mb-4">
+                Connect Your Wallet
+              </h2>
+              <p className="text-yellow-200 mb-6">
+                Please connect your wallet to view collection details and NFTs.
+              </p>
+              <div className="inline-block">
+                {/* WalletConnect component will be rendered by Navbar */}
+              </div>
+            </div>
+          ) : !isCorrectNetwork ? (
+            <div className="bg-gradient-to-br from-orange-500/10 to-red-500/10 border border-orange-500/30 rounded-2xl p-8 text-center mb-8">
+              <h2 className="text-2xl font-bold text-orange-300 mb-4">
+                Wrong Network
+              </h2>
+              <p className="text-orange-200 mb-6">
+                Please switch to Core Blockchain Testnet2 to view collection details.
+              </p>
+              <button
+                onClick={switchNetwork}
+                className="bg-gradient-to-r from-orange-500 to-red-500 text-white px-8 py-3 rounded-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
+              >
+                Switch to Core Testnet2
+              </button>
+            </div>
+          ) : null}
+
           {/* NFTs Grid */}
           <div className="mb-12">
             <h2 className="text-3xl font-bold text-white mb-8">NFTs in Collection</h2>
             
-            {nfts.length > 0 ? (
+            {!isConnected || !isCorrectNetwork ? (
+              <div className="text-center py-16">
+                <div className="w-24 h-24 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-4xl">🔒</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-4">
+                  Connect Wallet to View NFTs
+                </h3>
+                <p className="text-gray-400">
+                  Please connect your wallet and switch to Core Testnet2 to view NFTs in this collection.
+                </p>
+              </div>
+            ) : nfts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {nfts.map((nft) => (
                   <div key={nft.tokenId} className="bg-gray-800 rounded-2xl p-6 border border-gray-700 hover:border-gray-600 transition-all duration-300">
@@ -270,15 +326,14 @@ export default function CollectionDetailsPage() {
                       <p className="text-gray-500 text-sm mb-4">Not for sale</p>
                     )}
                     
-                    <button
-                      onClick={() => {
-                        setSelectedNFT(nft)
-                        setPurchasePrice(nft.price || '')
-                      }}
-                      className="w-full bg-primary-500 text-white py-2 rounded-xl font-bold hover:bg-primary-600 transition-colors duration-200"
-                    >
-                      {nft.forSale ? 'Purchase' : 'View Details'}
-                    </button>
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => handleOpenBidding(nft)}
+                        className="w-full bg-gradient-to-r from-secondary-500 to-purple-500 text-white py-2 rounded-xl font-bold hover:from-secondary-600 hover:to-purple-600 transition-all duration-200"
+                      >
+                        Place Bid
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -297,51 +352,23 @@ export default function CollectionDetailsPage() {
         </div>
       </div>
 
-      {/* Purchase Modal */}
-      {selectedNFT && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-3xl p-8 max-w-md w-full border border-gray-700">
-            <h3 className="text-2xl font-bold text-white mb-4">Purchase NFT</h3>
-            
-            <div className="mb-6">
-              <p className="text-gray-400 mb-2">NFT ID</p>
-              <p className="text-white font-bold">#{selectedNFT.tokenId}</p>
-            </div>
-            
-            <div className="mb-6">
-              <p className="text-gray-400 mb-2">Current Price</p>
-              <p className="text-primary-500 font-bold text-xl">{selectedNFT.price} CORE</p>
-            </div>
-            
-            <div className="mb-6">
-              <label className="block text-gray-400 mb-2">Your Offer (CORE)</label>
-              <input
-                type="number"
-                value={purchasePrice}
-                onChange={(e) => setPurchasePrice(e.target.value)}
-                placeholder="Enter price in CORE"
-                className="w-full bg-gray-700 border border-gray-600 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-primary-500"
-                step="0.01"
-                min="0"
-              />
-            </div>
-            
-            <div className="flex space-x-4">
-              <button
-                onClick={() => setSelectedNFT(null)}
-                className="flex-1 bg-gray-600 text-white py-3 rounded-xl font-bold hover:bg-gray-700 transition-colors duration-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handlePurchaseNFT(selectedNFT)}
-                className="flex-1 bg-primary-500 text-white py-3 rounded-xl font-bold hover:bg-primary-600 transition-colors duration-200"
-              >
-                Purchase
-              </button>
-            </div>
-          </div>
-        </div>
+
+
+      {/* Bidding Modal */}
+      {showBiddingModal && biddingNFT && (
+        <BiddingModal
+          isOpen={showBiddingModal}
+          onClose={() => {
+            setShowBiddingModal(false)
+            setBiddingNFT(null)
+          }}
+          nft={{
+            tokenId: biddingNFT.tokenId,
+            tokenURI: biddingNFT.tokenURI,
+            owner: biddingNFT.owner,
+            collectionAddress: collectionAddress
+          }}
+        />
       )}
     </div>
   )
