@@ -1,4 +1,4 @@
-import { CreateCollectionForm, CreateNFTForm, NFTAttribute, ValidationError } from '@/types'
+import { CreateCollectionForm, CreateNFTForm, NFTAttribute, ValidationError } from '../types'
 
 // Collection validation rules
 export const COLLECTION_VALIDATION_RULES = {

@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import Navbar from '@/components/ui/Navbar'
-import { getCollectionInfo, getCollectionStats, getCollectionNFTs } from '@/lib/contracts/client'
-import { useWallet } from '@/contexts/WalletContext'
-import BiddingModal from '@/components/nft/BiddingModal'
+import Navbar from '../../../components/ui/Navbar'
+import { getCollectionInfo, getCollectionStats, getCollectionNFTs } from '../../../lib/contracts/client'
+import { useWallet } from '../../../contexts/WalletContext'
+import BiddingModal from '../../../components/nft/BiddingModal'
 
 interface NFT {
   tokenId: number
@@ -109,14 +109,9 @@ export default function CollectionDetailsPage() {
       return
     }
 
-    if (!purchasePrice || parseFloat(purchasePrice) <= 0) {
-      alert('Please enter a valid price')
-      return
-    }
-
     try {
       // TODO: Implement NFT purchase logic
-      console.log('🛒 Purchasing NFT:', nft.tokenId, 'for', purchasePrice, 'CORE')
+      console.log('🛒 Purchasing NFT:', nft.tokenId)
       alert('NFT purchase functionality will be implemented soon!')
     } catch (err) {
       console.error('Error purchasing NFT:', err)

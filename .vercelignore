@@ -38,7 +38,7 @@ pids/
 *.seed
 *.pid.lock
 
-# Coverage directory used by tools like istanbul
+# Coverage directory
 coverage/
 *.lcov
 
@@ -69,13 +69,9 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# parcel-bundler cache (https://parceljs.org/)
+# parcel-bundler cache
 .cache
 .parcel-cache
-
-# Next.js build output
-.next/
-out/
 
 # Nuxt.js build / generate output
 .nuxt
@@ -118,4 +114,25 @@ DOCUMENTATION.md
 *.env
 secrets.json
 wallet.json
-.vercel
+
+# Git
+.git/
+.gitattributes
+
+# Hardhat config
+hardhat.config.js
+
+# Scripts
+scripts/
+
+# Contracts source
+contracts/
+
+# Test files
+test/
+**/*.test.js
+**/*.test.ts
+**/*.spec.js
+**/*.spec.ts
+
+

@@ -17,12 +17,12 @@ import {
   CheckCircle
 } from 'lucide-react'
 import ImageUpload from '../ImageUpload'
-import { CreateCollectionForm } from '@/types'
-import { validateCollectionForm, sanitizeCollectionForm } from '@/lib/nft-validation'
-import { useWallet } from '@/contexts/WalletContext'
-import { createCollection } from '@/lib/contracts/client'
+import { CreateCollectionForm } from '../../../types'
+import { validateCollectionForm, sanitizeCollectionForm } from '../../../lib/nft-validation'
+import { useWallet } from '../../../contexts/WalletContext'
+import { createCollection } from '../../../lib/contracts/client'
 import { ethers } from 'ethers'
-import WalletConnect from '@/components/ui/WalletConnect'
+import WalletConnect from '../../ui/WalletConnect'
 
 // Zod schema for form validation
 const collectionSchema = z.object({
@@ -299,10 +299,9 @@ export default function CollectionForm({ onSubmit, isLoading = false }: Collecti
             </h3>
             
             <ImageUpload
-              onImageUpload={handleCoverImageUpload}
+              onImageSelect={handleCoverImageUpload}
               onImageRemove={handleCoverImageRemove}
-              currentImage={coverImage}
-              accept="image/*"
+              selectedImage={coverImage}
               maxSize={5 * 1024 * 1024} // 5MB
             />
           </div>

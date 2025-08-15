@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Navbar from '@/components/ui/Navbar'
-import { useWallet } from '@/contexts/WalletContext'
-import { getAllCollections, getCollectionInfo, mintNFT } from '@/lib/contracts/client'
+import Navbar from '../../components/ui/Navbar'
+import { useWallet } from '../../contexts/WalletContext'
+import { getAllCollections, getCollectionInfo, mintNFT } from '../../lib/contracts/client'
 import { ethers } from 'ethers'
 
 interface Collection {

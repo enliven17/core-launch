@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import { Upload, X, Image as ImageIcon, AlertCircle } from 'lucide-react'
-import { validateFile, formatFileSize } from '@/lib/r2-client'
+import { validateFile, formatFileSize } from '../../../lib/r2-client'
 
 interface ImageUploadProps {
   onImageSelect: (file: File) => void

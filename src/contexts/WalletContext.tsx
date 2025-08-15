@@ -6,9 +6,9 @@ import {
   getCurrentChainId, 
   isCorrectNetwork, 
   switchToCoreTestnet2
-} from '@/lib/contracts/client'
-import { NETWORK_CONFIG } from '@/lib/contracts/constants'
-import { blockUnwantedWallets } from '@/utils/walletDetection'
+} from '../lib/contracts/client'
+import { NETWORK_CONFIG } from '../lib/contracts/constants'
+import { blockUnwantedWallets } from '../utils/walletDetection'
 
 interface WalletState {
   isConnected: boolean

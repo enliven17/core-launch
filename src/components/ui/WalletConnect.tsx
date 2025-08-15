@@ -2,8 +2,8 @@
 
 import React from 'react'
 import { Wallet, X, AlertTriangle, CheckCircle, Download } from 'lucide-react'
-import { useWallet } from '@/contexts/WalletContext'
-import { isMetaMaskAvailable } from '@/utils/walletDetection'
+import { useWallet } from '../../contexts/WalletContext'
+import { isMetaMaskAvailable } from '../../utils/walletDetection'
 
 interface WalletConnectProps {
   className?: string

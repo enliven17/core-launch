@@ -1,4 +1,4 @@
-import { CoreChainConfig } from '@/types'
+import { CoreChainConfig } from '../types'
 
 // Core Chain Testnet2 Configuration
 export const CORE_CHAIN_CONFIG: CoreChainConfig = {

@@ -4,11 +4,11 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Sparkles, CheckCircle, AlertCircle } from 'lucide-react'
-import CollectionForm from '@/components/nft/CollectionForm'
-import { CreateCollectionForm } from '@/types'
-import { getSigner, createCollection } from '@/lib/contracts/client'
-import Navbar from '@/components/ui/Navbar'
-import WalletConnect from '@/components/ui/WalletConnect'
+import CollectionForm from '../../../components/nft/CollectionForm'
+import { CreateCollectionForm } from '../../../types'
+import { getSigner, createCollection } from '../../../lib/contracts/client'
+import Navbar from '../../../components/ui/Navbar'
+import WalletConnect from '../../../components/ui/WalletConnect'
 
 export default function CreateCollectionPage() {
   const router = useRouter()

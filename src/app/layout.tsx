@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { WalletProvider } from '@/contexts/WalletContext'
-import { blockUnwantedWallets } from '@/utils/walletDetection'
+import { WalletProvider } from '../contexts/WalletContext'
+import { blockUnwantedWallets } from '../utils/walletDetection'
 
 // Block unwanted wallets globally
 if (typeof window !== 'undefined') {

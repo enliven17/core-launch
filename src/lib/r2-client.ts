@@ -1,4 +1,4 @@
-import { UploadResponse } from '@/types'
+import { UploadResponse } from '../types'
 
 // Cloudflare R2 Configuration
 export const R2_CONFIG = {

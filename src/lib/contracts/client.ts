@@ -402,6 +402,47 @@ export async function getBids(nftContract: string, tokenId: number) {
   }
 }
 
+export async function getCollectionNFTs(collectionAddress: string) {
+  try {
+    const collectionContract = new ethers.Contract(
+      collectionAddress,
+      [
+        "function totalSupply() view returns (uint256)",
+        "function ownerOf(uint256 tokenId) view returns (address)",
+        "function tokenURI(uint256 tokenId) view returns (string)"
+      ],
+      getProvider()
+    )
+
+    const totalSupply = await collectionContract.totalSupply()
+    const totalSupplyNum = parseInt(totalSupply.toString())
+
+    const nfts = []
+    for (let i = 1; i <= totalSupplyNum; i++) {
+      try {
+        const owner = await collectionContract.ownerOf(i)
+        const tokenURI = await collectionContract.tokenURI(i)
+        
+        nfts.push({
+          tokenId: i,
+          tokenURI,
+          owner: owner.toLowerCase(),
+          price: '0',
+          forSale: false
+        })
+      } catch (err) {
+        console.warn(`Error getting NFT ${i}:`, err)
+        break
+      }
+    }
+
+    return nfts
+  } catch (error) {
+    console.error('Error getting collection NFTs:', error)
+    return []
+  }
+}
+
 export async function switchToCoreTestnet2() {
   if (typeof window !== 'undefined' && window.ethereum) {
     try {
@@ -462,4 +503,72 @@ function getNFTBiddingContract(signer?: ethers.Signer) {
     CONTRACT_ABIS.NFT_BIDDING,
     contractSigner
   )
+}
+
+export async function approveNFTForBidding(
+  nftContract: string,
+  tokenId: number,
+  signer: ethers.Signer
+) {
+  try {
+    const nftContractInstance = new ethers.Contract(
+      nftContract,
+      [
+        "function approve(address to, uint256 tokenId) external",
+        "function getApproved(uint256 tokenId) external view returns (address)"
+      ],
+      signer
+    )
+
+    const biddingContractAddress = CONTRACT_ADDRESSES.NFT_BIDDING
+    console.log('✅ Approving NFT for bidding contract:', biddingContractAddress)
+
+    const tx = await nftContractInstance.approve(biddingContractAddress, tokenId)
+    console.log('⏳ Approval transaction sent:', tx.hash)
+
+    const receipt = await tx.wait()
+    console.log('✅ NFT approved successfully!')
+
+    return {
+      success: true,
+      transactionHash: tx.hash,
+      receipt
+    }
+  } catch (error) {
+    console.error('Error approving NFT for bidding:', error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }
+  }
+}
+
+export async function checkNFTApproval(
+  nftContract: string,
+  tokenId: number,
+  owner: string
+): Promise<boolean> {
+  try {
+    const nftContractInstance = new ethers.Contract(
+      nftContract,
+      [
+        "function getApproved(uint256 tokenId) external view returns (address)",
+        "function isApprovedForAll(address owner, address operator) external view returns (bool)"
+      ],
+      getProvider()
+    )
+
+    const approvedAddress = await nftContractInstance.getApproved(tokenId)
+    const biddingContractAddress = CONTRACT_ADDRESSES.NFT_BIDDING
+
+    if (approvedAddress.toLowerCase() === biddingContractAddress.toLowerCase()) {
+      return true
+    }
+
+    const isApprovedForAll = await nftContractInstance.isApprovedForAll(owner, biddingContractAddress)
+    return isApprovedForAll
+  } catch (error) {
+    console.error('Error checking NFT approval:', error)
+    return false
+  }
 }

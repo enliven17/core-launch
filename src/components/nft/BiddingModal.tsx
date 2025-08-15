@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react'
 import { X, Gavel, Clock, User, DollarSign, CheckCircle, AlertCircle } from 'lucide-react'
-import { useWallet } from '@/contexts/WalletContext'
+import { useWallet } from '../../contexts/WalletContext'
 import { 
   placeBid, 
   getBiddingInfo, 
@@ -12,7 +12,7 @@ import {
   getSigner,
   approveNFTForBidding,
   checkNFTApproval
-} from '@/lib/contracts/client'
+} from '../../lib/contracts/client'
 import { ethers } from 'ethers'
 
 interface BiddingModalProps {
